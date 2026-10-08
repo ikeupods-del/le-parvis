@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Tests de sécurité de la base (RLS)
+        run: npm run test:db
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

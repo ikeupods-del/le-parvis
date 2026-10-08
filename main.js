@@ -12,6 +12,7 @@ import { S } from './lib/state.js';
 import { applyTheme } from './lib/theme.js';
 import { setViews, hasView, render } from './lib/router.js';
 import { checkNotif, syncReminders } from './lib/reminders.js';
+import { initAuth } from './lib/auth.js';
 import { today } from './views/today.js';
 import { read } from './views/read.js';
 import { prayer } from './views/prayer.js';
@@ -32,6 +33,7 @@ try {
 } catch (e) {}
 
 applyTheme();
+initAuth();
 render();
 setInterval(checkNotif, 30000);
 syncReminders();

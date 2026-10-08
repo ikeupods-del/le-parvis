@@ -2,14 +2,14 @@
 import { S, save, resetState } from '../lib/state.js';
 import { $, esc, modal, on, toast } from '../lib/util.js';
 import { applyTheme } from '../lib/theme.js';
-import { doSignIn } from '../lib/auth.js';
+import { doSignIn, signOut, savePseudo, isSimulated } from '../lib/auth.js';
 import { render } from '../lib/router.js';
 
 function html() {
   return `
   <h2>Votre profil</h2>
   <div class="card">
-    <p class="small" style="margin-bottom:8px">${S.user ? `Connecté avec Google : <b>${esc(S.user.email)}</b> (simulation)` : 'Non connecté. La connexion Google est requise pour les salons.'}</p>
+    <p class="small" style="margin-bottom:8px">${S.user ? `Connecté avec Google : <b>${esc(S.user.email)}</b>${isSimulated ? ' (simulation)' : ''}` : 'Non connecté. La connexion Google est requise pour les salons.'}</p>
     ${S.user ? '<button class="btn small" id="gout">Se déconnecter</button>' : '<button class="btn small" id="gsign2">Se connecter avec Google</button>'}
   </div>
   <div class="card">
@@ -33,8 +33,8 @@ function html() {
 
 function bind() {
   on('#gsign2', doSignIn);
-  on('#gout', () => { S.user = null; save(); render(); toast('Déconnecté'); });
-  const ps = $('#pseudo'); if (ps) ps.onchange = () => { S.pseudo = ps.value.trim(); save(); toast('Pseudo enregistré'); };
+  on('#gout', signOut);
+  const ps = $('#pseudo'); if (ps) ps.onchange = async () => { const ok = await savePseudo(ps.value.trim()); toast(ok ? 'Pseudo enregistré' : "Pseudo non enregistré, réessayez"); };
   const th = $('#theme'); if (th) { th.value = S.theme; th.onchange = () => { S.theme = th.value; save(); applyTheme(); }; }
   on('#showCharter', () => modal(`<h3>Charte de la communauté</h3><ul><li>Respect de chacun, quelle que soit sa confession.</li><li>Pas de prosélytisme agressif, pas de débat de confession.</li><li>Pas de harcèlement, de haine ni de contenu inapproprié.</li><li>Les demandes de prière sont accueillies avec bienveillance.</li><li>Les modérateurs peuvent supprimer un message et bannir.</li></ul>`));
   on('#exportAll', () => modal(`<h3>Mes données</h3><p class="small muted">Copie de tout ce que l'application garde pour vous.</p><textarea readonly style="min-height:220px">${esc(JSON.stringify(S, null, 2))}</textarea><div style="height:12px"></div>`));
